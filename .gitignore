@@ -1,17 +1,6 @@
-# Python
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-*.so
-.venv/
-venv/
-
 # Terraform local working dir
 **/.terraform/*
-
-# Terraform generated runtime output folder (from main.py)
-terraform/.terraform-generated/
+**/.terraform-generated/
 
 # Terraform state files
 *.tfstate

@@ -1,71 +1,58 @@
-# Terraform GCS Bucket (Basic)
+# Terraform GCS Bucket Module
 
-Basic project structure to create a Google Cloud Storage bucket using Terraform, with a small Python entry script.
+Reusable Terraform module to create a Google Cloud Storage bucket.
 
-## Structure
+## Module source
 
-- `main.py` — runs `terraform init` and `terraform apply`
-- `terraform/main.tf` — provider + bucket resource
-- `terraform/variables.tf` — input variables
+Use this repo directly as a module source:
 
-## Prerequisites
+`git::https://github.com/pboddeti/terraform_module_agent.git?ref=main`
 
-- Terraform installed
-- Python 3.9+
-- Google Cloud authentication configured (for example using ADC):
-  - `gcloud auth application-default login`
+For stable usage, prefer a tag such as `?ref=v1.0.0`.
 
-## Usage
+## Inputs
 
-```bash
-python main.py \
-  --bucket-name YOUR_UNIQUE_BUCKET_NAME \
-  --auto-approve
+- `project_id` - GCP project ID where the bucket will be created
+- `bucket_name` - globally unique bucket name
+- `region` - bucket location, default `us-central1`
+- `force_destroy` - whether bucket objects should be deleted on destroy, default `false`
+
+## Outputs
+
+- `bucket_name`
+- `bucket_id`
+- `bucket_url`
+
+## Example usage from another repo
+
+```hcl
+terraform {
+  required_version = ">= 1.5.0"
+
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "google" {
+  project = var.project_id
+  region  = var.region
+}
+
+module "bucket" {
+  source = "git::https://github.com/pboddeti/terraform_module_agent.git?ref=main"
+
+  project_id  = var.project_id
+  bucket_name = var.bucket_name
+  region      = var.region
+}
 ```
-
-Defaults already set:
-- `project_id`: `arctic-rite-403213` (in `terraform/variables.tf`)
-- `region`: `us-central1`
-
-Optional override:
-
-```bash
-python main.py \
-  --project-id YOUR_GCP_PROJECT_ID \
-  --region us-central1 \
-  --bucket-name YOUR_UNIQUE_BUCKET_NAME \
-  --auto-approve
-```
-
-If you want the script to run `gcloud` auth + project setup first (interactive login), use:
-
-```bash
-python main.py \
-  --bucket-name YOUR_UNIQUE_BUCKET_NAME \
-  --setup-gcloud \
-  --auto-approve
-```
-
-## Generated files
-
-When you run `main.py`, Terraform runtime files are grouped under:
-
-- `terraform/.terraform-generated/`
-  - `data/` (Terraform working/plugin data via `TF_DATA_DIR`)
-  - `state/terraform.tfstate` (local state file via Terraform local backend)
-
-You can change this folder with:
-
-```bash
-python main.py \
-  --bucket-name YOUR_UNIQUE_BUCKET_NAME \
-  --output-dir .tf-run \
-  --auto-approve
-```
-
-Note: `terraform/.terraform.lock.hcl` is still created in the Terraform config folder by Terraform.
 
 ## Notes
 
+- This repo is now a Terraform module, not a runnable wrapper project.
+- Authentication, backend, and provider configuration should be defined in the calling repo.
 - Bucket names must be globally unique.
-- This is intentionally minimal for a starter setup.
