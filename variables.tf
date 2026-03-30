@@ -19,3 +19,9 @@ variable "force_destroy" {
   type        = bool
   default     = false
 }
+
+variable "objects" {
+  description = "Map of objects to create in the bucket. Key is object name, value is object content"
+  type        = map(string)
+  default     = {}
+}

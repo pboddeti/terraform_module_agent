@@ -17,3 +17,11 @@ resource "google_storage_bucket" "this" {
 
   uniform_bucket_level_access = true
 }
+
+resource "google_storage_bucket_object" "objects" {
+  for_each = var.objects
+
+  bucket  = google_storage_bucket.this.name
+  name    = each.key
+  content = each.value
+}
